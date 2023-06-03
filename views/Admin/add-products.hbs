@@ -1,0 +1,28 @@
+<section>
+<div class="container">
+    <a href="Admin/add-products" class="btn btn-success mt-4 mb-4y">Add products</a>
+    <table class="table">
+  <thead>
+    <tr>
+      <th scope="col">#</th>
+      <th scope="col">Name</th>
+      <th scope="col">category</th>
+      <th scope="col">description</th>
+    </tr>
+  </thead>
+  <tbody>
+    {{#each products}}
+    <tr>
+        
+      <th scope="row">1</th>
+      <td>{{name}}</td>
+      <td>{{Category}}</td>
+      <td>{{description}}</td>
+     
+    </tr>
+    {{/each}}
+  </tbody>
+</table>
+</div>
+
+</section>

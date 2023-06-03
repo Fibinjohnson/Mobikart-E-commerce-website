@@ -1,0 +1,16 @@
+body {
+  
+  font: 14px "Lucida Grande", Helvetica, Arial, sans-serif;
+  color: aqua;
+}
+
+a {
+  color: #022a39;
+}
+.card{
+  border-radius: 1.25rem !important;
+}
+.row {
+  margin-left: -48px !important;
+ 
+}
