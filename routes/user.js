@@ -1,36 +1,57 @@
 var express = require('express');
 var router = express.Router();
+var products=require("../helpers/product-herpers")
+var userSignup=require('../helpers/user-helper');
+const session = require('express-session');
 
 /* GET home page. */
 router.get('/', function(req, res, next) {
-  let products=[
-    {
-      name:"IPHONE 11 PRO",
-      Category:"Mobile",
-      description:"This is a good phone",
-      image:"https://img2.gadgetsnow.com/gd/images/products/additional/large/G390830_View_1/mobiles/smartphones/apple-iphone-14-pro-256-gb-deep-purple-6-gb-ram-.jpg"
-    },
-    {
-      name:"samsung s22 ultra",
-      Category:"Mobile",
-      description:"This is a good phone",
-      image:"https://images.samsung.com/in/smartphones/galaxy-s23-ultra/buy/product_color_green.png?imwidth=480"
-    },
-    {
-      name:"vivo  v5 PRO",
-      Category:"Mobile",
-      description:"This is a good phone",
-      image:"https://img1.gadgetsnow.com/gd/images/products/additional/large/G313386_View_1/mobiles/refurbished-mobiles/refurbished-vivo-v5-space-grey-32gb-4gb-ram-.jpg"
-    },
-    {
-      name:"Redmi Note 9  PRO",
-      Category:"Mobile",
-      description:"This is a good phone",
-      image:"https://img1.gadgetsnow.com/gd/images/products/additional/large/G226361_View_1/mobiles/smartphones/xiaomi-redmi-note-10-pro-128-gb-vintage-bronze-8-gb-ram-.jpg"
-    }
-  ]
+ products.listAdminProducts().then((product)=>{
+  let user=req.session.user
+  res.render('users/index', { product ,user})
   
-  res.render('index', { products })
+ })
+  
+ 
 });
+router.get("/login",(req,res)=>{
+  if(req.session.loggedIn) {
+    res.redirect('/')
+  }else
+  res.render("users/login",{"error":req.session.logError})
+  req.session.logError=false
+  
+
+}
+)
+router.get("/signup",(req,res)=>{
+  res.render("users/signup")
+}
+)
+router.post('/signup',(req,res)=>{
+  userSignup.doSignup(req.body).then((data)=>console.log(data))
+  
+
+})
+router.post("/login",(req,res)=>{
+  userSignup.doLogin(req.body).then((data)=>{
+    if(data.status){
+      req.session.loggedIn=true;
+      req.session.user=data.user;
+     
+      
+      res.redirect("/")
+  }
+   else{
+    req.session.logError="Invalid username or Password";
+    res.redirect("/login")
+   
+    
+   }})
+})
+router.get('/logout',(req,res)=>{
+  req.session.destroy();
+  res.redirect("/login")
+})
 
 module.exports = router;
