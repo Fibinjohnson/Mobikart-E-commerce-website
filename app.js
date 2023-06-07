@@ -11,10 +11,6 @@ var adminRouter = require('./routes/admin');
 const hbs = require("express-handlebars")
 const fileUpload=require("express-fileupload");
 var Session=require('express-session');
-
-
-
-
 var app = express();
 
 // view engine setup
@@ -37,9 +33,7 @@ app.use(express.static(path.join(__dirname, 'public')));
 
 app.use(fileUpload());
 app.use(Session({ secret: 'session',
-cookie: { maxAge: 60000 }
-
-
+cookie: { maxAge: 6000000 }
 }))
 
 

@@ -17,14 +17,12 @@ router.post("/add-products",(req,res)=>{
    
   productHelpers.addProducts(req.body,((image)=>{
     console.log(image);
-    imageInPath=req.files.customFile;
-    console.log(imageInPath);
-   
-    imageInPath.mv("./public/images/"+image+".jpg",(err=>{
+   if(req.files && req.files.customFile){
+    req.files.customFile.mv("./public/images/"+image+".jpg",(err=>{
       if(!err){res.redirect('/Admin')
       }
       else console.log(err)
-    }))
+    }))}
     
     }));
 })
@@ -44,8 +42,15 @@ router.get('/edit-Product/:id',(req,res)=>{
 
 })
 router.post('/edit-products/:id',(req,res)=>{
-  productHelpers.updateProducts(req.params.id,req.body).then((response)=>{console.log(response)})
-}).id
+  productHelpers.updateProducts(req.params.id,req.body).then(()=>{
+    // res.redirect("/Admin")
+    if(req.files && req.files.customFile){
+      req.files.customFile.mv("./public/images/"+req.params.id+".jpg")
+    }else{
+      res.redirect("/Admin")
+    }
+  })
+})
 
 
 module.exports = router;

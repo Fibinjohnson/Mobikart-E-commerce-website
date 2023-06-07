@@ -51,7 +51,14 @@ module.exports = {
   },
   updateProducts:(prodId,products)=>{
     return new Promise(async(resolve,reject)=>{
-      
+      const database=await connectToDB();
+      database.collection(collection.COLLECTION_NAME).updateOne({_id:new ObjectId(prodId)},{$set:{
+        name:products.name,
+        description:products.description,
+        category:products.category,
+        price:products.price
+      }
+    }).then((product)=>resolve(product))
     })
   }
   

@@ -2,7 +2,8 @@ var express = require('express');
 var router = express.Router();
 var products=require("../helpers/product-herpers")
 var userSignup=require('../helpers/user-helper');
-const session = require('express-session');
+
+const userHelper = require('../helpers/user-helper');
 
 /* GET home page. */
 router.get('/', function(req, res, next) {
@@ -29,7 +30,7 @@ router.get("/signup",(req,res)=>{
 }
 )
 router.post('/signup',(req,res)=>{
-  userSignup.doSignup(req.body).then((data)=>console.log(data))
+  userSignup.doSignup(req.body).then((data)=>console.log(data), res.redirect("/"))
   
 
 })
@@ -38,8 +39,6 @@ router.post("/login",(req,res)=>{
     if(data.status){
       req.session.loggedIn=true;
       req.session.user=data.user;
-     
-      
       res.redirect("/")
   }
    else{
@@ -53,5 +52,13 @@ router.get('/logout',(req,res)=>{
   req.session.destroy();
   res.redirect("/login")
 })
-
+router.get("/cart",(req,res)=>{
+  res.render('users/cart')
+})
+router.get('/Add-Products-Cart/:id',(req,res)=>{
+  
+  userHelper.addProductsCart(req.session.user._id,req.params.id).then(()=>{
+    res.redirect("/")
+  })
+})
 module.exports = router;

@@ -6,8 +6,7 @@ async function connectToDB() {
 
   try {
     await client.connect();
-    console.log('Connected to the database');
-
+    console.log("connection.js clear")
     const database = client.db('shopping'); // Update with your database name
     
     return database;

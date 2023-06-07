@@ -18,10 +18,10 @@
     <label for="">price</label>
     <input type="text" value="{{product.price}}" name="price" class="form-control"  >
   </div>
-  <img src="/images/{{prodId}}.jpg" width="100px" height="100px"></img>
+  <img src="/images/{{prodId}}.jpg" width="100px" id="img" height="100px"></img>
   <div class="form-group">
    <label class="form-label" for="customFile">Add image</label>
-   <input type="file" class="form-control" name="customFile" />
+   <input type="file" class="form-control" onchange="changeImage(event)" name="customFile" />
   </div>
  
   <button type="submit" class="btn btn-primary">Submit</button>
@@ -29,3 +29,9 @@
 </div>
 
 </section>
+<script>
+  function changeImage(e){
+    document.getElementById("img").src=URL.createObjectURL(e.target.files[0]);
+    
+  }
+</script>
