@@ -1,1 +1,25 @@
-<h2>cart is empty</h2>
+
+<table class="table table-striped">
+   
+  <thead>
+    <tr>
+      <th scope="col">#</th>
+      <th scope="col">Product</th>
+      <th scope="col">description</th>
+      <th scope="col"></th>
+      <th scope="col "></th>
+    </tr>
+  </thead>
+   {{#each cart}}
+  <tbody>
+    <tr>
+      <th scope="row">1</th>
+      <td>{{name}}</td>
+      <td>{{category}}</td>
+      <td><button class="btn btn-outline-secondary me-2" style="width: 50px;">+</button > 1 <button class="btn btn-outline-secondary btn " style="width: 50px;"> - </button></td>
+      <td><p class="btn btn-danger">Delete</p></td>
+    </tr>
+   
+  </tbody>
+  {{/each}}
+</table>
