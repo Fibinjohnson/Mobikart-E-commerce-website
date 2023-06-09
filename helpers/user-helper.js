@@ -48,36 +48,63 @@ doLogin: (userLogin) => {
       }
     });
   },
-  addProductsCart:(userId,userProducts)=>{return new Promise(async(resolve,reject)=>{
-    console.log("useridf:" ,userId)
-     const cart={
-          user:new ObjectId(userId),
-          product:[new ObjectId(userProducts)]
-    }
+ addProductsCart:(userId,userProducts)=>{return new Promise(async(resolve,reject)=>{
+  const prodObj={
+    prodid:new ObjectId(userProducts),
+    prodIndex:1
+  }
+  const cart={
+     user:new ObjectId(userId),
+     product:[prodObj]
+  }
     
 const database=await connectToDB();
 const userCart = await database.collection("newCart").findOne({ user: new ObjectId(userId) });
-console.log('Before find toArray');
-database.collection("newCart").find().toArray().then((res) => console.log(res));
-console.log('After find toArray');
+// console.log('Before find toArray');
+// database.collection("newCart").find().toArray().then((res) => console.log(res));
+// console.log('After find toArray');
 
 if (userCart) {
-  console.log('Updating existing document');
-  const collect = database.collection("newCart");
-  collect.updateOne(
-    { user: new ObjectId(userId) },
-    {
-      $push: { product: new ObjectId(userProducts) }
-    }
-  ).then((response) => resolve(response));
+let index=userCart.product.findIndex((product)=> { console.log("consoling indexof",product.prodid,new ObjectId(userProducts));return  userProducts==product.prodid} )
+console.log(index)
+     if(index!==-1){
+      console.log("call invoked");
+       await database
+      .collection("newCart")
+      .updateOne(
+        { "product.prodid": new ObjectId(userProducts) },
+        { $inc: { "product.$.prodIndex": 1 } }
+      )
+      .then((res) =>console.log("res",res), resolve())
+      .catch((error) => {
+        console.error("Error occurred during insertion:", error);
+        reject(error); // Reject the promise if an error occurs
+      });
+    
+
+      }else{
+         console.log('Updating existing document');
+         const collect = database.collection("newCart");
+         collect.updateOne(
+        { user: new ObjectId(userId) },
+         {
+        $push: { product: prodObj }
+        }
+       ).then(() => resolve());}
+ 
 } else {
-  console.log('Inserting new document');
+  
   await database.collection("newCart").insertOne(cart).then((res) => {
     resolve(res);
   });
 }  
+
   }
   )},
+
+
+
+
   AddToUsercart:(userId)=>
   {
     return new Promise(async(resolve,reject)=>{

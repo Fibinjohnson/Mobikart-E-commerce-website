@@ -64,10 +64,9 @@ router.get("/cart", (async (req, res) => {
   res.render('users/cart', { user, cart })
 }))
 router.get('/Add-Products-Cart/:id', async (req, res) => {
-
+  console.log("call came")
   await userHelper.addProductsCart(req.session.user._id, req.params.id).then(() => {
-    console.log(req.session.user._id, req.params.id);
-    res.redirect("/")
+     res.json({status:true})
   })
 })
 module.exports = router;
