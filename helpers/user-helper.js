@@ -72,7 +72,7 @@ console.log(index)
        await database
       .collection("newCart")
       .updateOne(
-        { "product.prodid": new ObjectId(userProducts) },
+        {user:new ObjectId(userId), "product.prodid": new ObjectId(userProducts) },
         { $inc: { "product.$.prodIndex": 1 } }
       )
       .then((res) =>console.log("res",res), resolve())
@@ -114,24 +114,44 @@ console.log(index)
         {
           $match:{user: new ObjectId(userId) }
         },
-       {
-         $lookup:{
-          from:collection.COLLECTION_NAME,
-          let:{prodList:"$product"},
-          pipeline:[
-            {
-              $match:{
-                $expr:{
-                  $in:["$_id","$$prodList"]
-                }
-              }
-            }
-          ],as:"CartItem"
+        {
+          $unwind:"$product"
+        },
+        {
+          $project:{
+            item:"$product.prodid",
+            index:"$product.prodIndex"
+          }
+        },{
+          $lookup:{
+            from:collection.COLLECTION_NAME,
+            localField:"item",
+            foreignField:"_id",
+            as:"products"
+          }
+        },{
+          $project:{
+            item:1,index:1,product:{$arrayElemAt:['$products',0]}
+          }
         }
-      }
+      //  {
+      //    $lookup:{
+      //     from:collection.COLLECTION_NAME,
+      //     let:{prodList:"$product"},
+      //     pipeline:[
+      //       {
+      //         $match:{
+      //           $expr:{
+      //             $in:["$_id","$$prodList"]
+      //           }
+      //         }
+      //       }
+      //     ],as:"CartItem"
+      //   }
+      // }
       ]).toArray()
       console.log(userCartData,"this")
-      resolve(userCartData[0].CartItem)
+      resolve(userCartData)
      } catch (error) {
         reject(error);
       }              
@@ -150,7 +170,25 @@ console.log(index)
       }
 
     })
-   }
+   },
+  changeQuantity:(object)=>{
+    // console.log("object",object)
+    count=parseInt(object.count);
+    
+    return new Promise(async(resolve,reject)=>{
+      const database=await connectToDB();
+      await database
+      .collection("newCart")
+      .updateOne(
+        {_id:new ObjectId(object.cart), "product.prodid": new ObjectId(object.product) },
+        { $inc: { "product.$.prodIndex": count } }
+      ).then(()=>{
+       
+        resolve(database.collection("newCart").findOne( {_id:new ObjectId(object.cart), "product.prodid": new ObjectId(object.product) }))
+      })
+    }
+    )
+  }
   
 
 

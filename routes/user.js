@@ -68,5 +68,9 @@ router.get('/Add-Products-Cart/:id', async (req, res) => {
   await userHelper.addProductsCart(req.session.user._id, req.params.id).then(() => {
      res.json({status:true})
   })
+}),
+router.post("/change-quantity",async(req,res)=>{
+  console.log("req body",req.body)
+  await userHelper.changeQuantity(req.body).then((response)=>{res.json({status:true},{index:response.prodIndex}),console.log(response,'EXPECTEDRESPONSE')})
 })
 module.exports = router;

@@ -17,4 +17,25 @@ function addToCart(id) {
     });
     console.log("ended")
   }
+
+
+  function changeQuantity(Cartid,productId,count){
+       
+    $.ajax( 
+    
+      {
+       url:"/change-quantity",
+       data:{
+         cart:Cartid,product:productId,count:count
+       },
+       type:"post",
+       success:(response)=>{
+        console.log(response.status,"status")
+       }
+
+      }
+    )
+
+
+}
   
