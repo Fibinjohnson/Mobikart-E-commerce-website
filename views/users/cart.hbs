@@ -1,11 +1,13 @@
-
-<table class="table table-striped">
+<section class=" w-75 p-3  mx-auto ">
+  <div class="">
+<table class="table table-striped  ">
    
   <thead>
     <tr>
       <th scope="col">#</th>
       <th scope="col">Product</th>
-      <th scope="col">description</th>
+       <th scope="col">description</th>
+      <th scope="col">Price</th>
       <th scope="col"></th>
       <th scope="col "></th>
     </tr>
@@ -17,34 +19,16 @@
       
       <td><img src="images/{{product._id}}.jpg" style="height: 50px; width:50px"></td>
       <td>{{product.name}}</td>
+      <td>{{product.price}}</td>
       <td>{{product.category}}</td>
       
-      <td><button class="btn btn-outline-secondary me-2"  onclick="changeQuantity('{{_id}}','{{product._id}}',-1)" style="width: 50px;">-</button > {{index}} <button class="btn btn-outline-secondary btn "  style="width: 50px;" onclick="changeQuantity('{{_id}}','{{product._id}}',1)" > + </button></td>
-      <td><p class="btn btn-danger">Delete</p></td>
+      <td><button class="btn btn-outline-secondary me-2" id="minus" onclick="changeQuantity('{{_id}}','{{product._id}}',-1)" style="width: 50px;">-</button > <span id="{{product._id}}">{{index}}</span>  <button  class="btn btn-outline-secondary btn "  style="width: 50px;" onclick="changeQuantity('{{_id}}','{{product._id}}',1)" > + </button></td>
+      <td><p class="btn btn-danger" onclick="remove('{{_id}}','{{product._id}}')">Delete</p></td>
     </tr>
    
   </tbody>
   {{/each}}
 </table>
-{{!-- <script>
-{{!-- function //changeQuantity(Cartid,productId,count){
-       
-       $.ajax( 
-       
-         {
-          url:"/change-quantity",
-          data:{
-            cart:Cartid,product:productId,count:count
-          },
-          type:"post",
-          success:(response)=>{
-            console.log(response,"resp")
-          }
-
-         }
-       )
-
-
-} --}}
-
-</script> --}}
+<h3 class="d-flex justify-content-end me-5 ">Total:10,000/- </h3>
+</div>
+</section>

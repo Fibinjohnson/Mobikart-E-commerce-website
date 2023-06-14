@@ -172,24 +172,45 @@ console.log(index)
     })
    },
   changeQuantity:(object)=>{
-    // console.log("object",object)
+    
     count=parseInt(object.count);
+    quantity=parseInt(object.quantity)
     
     return new Promise(async(resolve,reject)=>{
       const database=await connectToDB();
-      await database
-      .collection("newCart")
-      .updateOne(
-        {_id:new ObjectId(object.cart), "product.prodid": new ObjectId(object.product) },
-        { $inc: { "product.$.prodIndex": count } }
-      ).then(()=>{
-       
-        resolve(database.collection("newCart").findOne( {_id:new ObjectId(object.cart), "product.prodid": new ObjectId(object.product) }))
-      })
+
+      if(count==-1 && quantity == 1){
+        await database.collection("newCart").updateOne({_id:new ObjectId(object.cart)},
+        {$pull:{product:{prodid:new ObjectId(object.product)}}}).then((response)=>resolve({removeStatus:true},console.log("wanted response",response)))
+      }
+      else
+      {
+        await database
+        .collection("newCart")
+        .updateOne(
+          {_id:new ObjectId(object.cart), "product.prodid": new ObjectId(object.product) },
+          { $inc: { "product.$.prodIndex": count } }
+        ).then((response)=>{
+         
+          resolve(true)
+        })
+      }
     }
     )
-  }
+  },
   
+
+remove:(object)=>{
+
+   return new Promise(async(resolve,reject)=>{
+     const  database= await connectToDB();
+     await database.collection("newCart").updateOne({_id:new ObjectId(object.cartId)},
+    {$pull:{product:{prodid:new ObjectId(object.productId)}}}
+    ).then((response)=>resolve(true))
+
+   })
+   
+}
 
 
   

@@ -11,8 +11,11 @@ router.get('/', async function (req, res, next) {
     let user = req.session.user
     if (user) {
       count = await userHelper.getCartCount(user._id)
+      res.render('users/index', { product, user, count })
+    }else{
+      res.redirect("/login")
     }
-    res.render('users/index', { product, user, count })
+    
   })
 });
 router.get("/login", (req, res) => {
@@ -71,6 +74,9 @@ router.get('/Add-Products-Cart/:id', async (req, res) => {
 }),
 router.post("/change-quantity",async(req,res)=>{
   console.log("req body",req.body)
-  await userHelper.changeQuantity(req.body).then((response)=>{res.json({status:true},{index:response.prodIndex}),console.log(response,'EXPECTEDRESPONSE')})
+  await userHelper.changeQuantity(req.body).then((response)=>{res.json(response)})
+})
+router.post("/remove",async(req,res)=>{
+  await userHelper.remove(req.body).then((response)=>{res.json(response)})
 })
 module.exports = router;
