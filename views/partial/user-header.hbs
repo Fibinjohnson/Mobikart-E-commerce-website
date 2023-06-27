@@ -1,53 +1,54 @@
- <header>
+<header>
+  <nav class="navbar navbar-expand-lg navbar-light bg-light">
+    <a class="navbar-brand" href="#">Shopping cart</a>
+    <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarSupportedContent"
+      aria-controls="navbarSupportedContent" aria-expanded="false" aria-label="Toggle navigation">
+      <span class="navbar-toggler-icon"></span>
+    </button>
 
-        <nav class="navbar navbar-expand-lg navbar-light bg-light">
-            <a class="navbar-brand" href="#">Shopping cart</a>
-            <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarSupportedContent"
-                aria-controls="navbarSupportedContent" aria-expanded="false" aria-label="Toggle navigation">
-                <span class="navbar-toggler-icon"></span>
-            </button>
+    <div class="collapse navbar-collapse" id="navbarSupportedContent">
+      <ul class="navbar-nav mr-auto">
+        <li class="nav-item active">
+          <a class="nav-link" href="/">Home <span class="sr-only">(current)</span></a>
+        </li>
+        <li class="nav-item">
+          <a class="nav-link" href="/orders">Your Orders</a>
+        </li>
 
-            <div class="collapse navbar-collapse" id="navbarSupportedContent">
-                <ul class="navbar-nav mr-auto">
-                    <li class="nav-item active">
-                        <a class="nav-link" href="/">Home <span class="sr-only">(current)</span></a>
-                    </li>
-                    <li class="nav-item">
-                        <a class="nav-link" href="#">Link</a>
-                    </li>
-                 
-                    <li class="nav-item">
-                        <a class="nav-link " href="/cart" tabindex="-1" aria-disabled="true">cart <span class="badge badge-danger"  id="cartCount">{{count}}</span></a>
-                    </li>
-                    <li>
-                         <form class="form-inline my-2 my-lg-0">
-                    <input class="form-control mr-sm-2" type="search" placeholder="Search" aria-label="Search">
-                    <button class="btn btn-outline-success my-2 my-sm-0" type="submit">Search</button>
-                       </form>
-                    </li>
-                   
-                </ul>
-                  <div class="dropdown">
-  <button class="btn btn-secondary dropdown-toggle" type="button" id="dropdownMenuButton" data-toggle="dropdown" aria-haspopup="true">
-    {{#if user}}
-       {{user.name}}
-       {{else}}
-         users
-    {{/if}}
-   
-  </button>
-  <div class="dropdown-menu" aria-labelledby="dropdownMenuButton">
-   {{#if user}}
-       <a class="dropdown-item" href="/logout"> Logout </a>
-       {{else}}
-         <a class="dropdown-item" href="/login">Login  </a>
-    {{/if}}
-   
-   
-    <a class="dropdown-item" href="/signup">signup</a>
-   
-  </div>
-</div>
-            </div>
-        </nav>
-    </header>
+        <li class="nav-item">
+          <a class="nav-link " href="/cart" tabindex="-1" aria-disabled="true">cart
+            <span class="badge badge-danger" id="cartCount">{{count}}</span></a>
+        </li>
+        <li>
+          <form class="form-inline my-2 my-lg-0">
+            <input class="form-control mr-sm-2" type="search" placeholder="Search" aria-label="Search">
+            <button class="btn btn-outline-success my-2 my-sm-0" type="submit">Search</button>
+          </form>
+        </li>
+
+      </ul>
+      <div class="dropdown">
+        <button class="btn btn-secondary dropdown-toggle" type="button" id="dropdownMenuButton"
+          data-toggle="dropdown" aria-haspopup="true">
+          {{#if user}}
+          {{user.name}}
+          {{else}}
+          users
+          {{/if}}
+        </button>
+        <div class="dropdown-menu" aria-labelledby="dropdownMenuButton">
+          {{#if user}}
+          <a class="dropdown-item" href="/logout">Logout</a>
+          {{else}}
+          <a class="dropdown-item" href="/login">Login</a>
+          {{/if}}
+          <a class="dropdown-item" href="/signup">Signup</a>
+        </div>
+      </div>
+    </div>
+  </nav>
+</header>
+
+{{!-- <script>
+ 
+</script> --}}

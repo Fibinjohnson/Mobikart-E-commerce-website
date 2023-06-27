@@ -1,29 +1,42 @@
-var express = require('express');
-var router = express.Router();
-var products = require("../helpers/product-herpers")
-var userSignup = require('../helpers/user-helper');
-
+const express = require('express');
+const router = express.Router();
+const products = require("../helpers/product-herpers")
 const userHelper = require('../helpers/user-helper');
+const verifyUser=(req,res,next)=>{
+   if(req.session.user.loggedIn){
+     next()
+   }else{
+    redirect("/login")
+   }
+}
 
-/* GET home page. */
-router.get('/', async function (req, res, next) {
-  await products.listAdminProducts().then(async (product) => {
-    let user = req.session.user
+router.get('/', async (req, res, next) =>{
+  try {
+   
+    const product = await products.listAdminProducts();
+    let user =  req.session.user;
     if (user) {
-      count = await userHelper.getCartCount(user._id)
-      res.render('users/index', { product, user, count })
-    }else{
-      res.redirect("/login")
+      let count=0
+       count = await  userHelper.getCartCount(user._id);
+      console.log(count,"count")
+      res.render('users/index', { product, user, count });
+    } else {
+      res.redirect("/login");
     }
-    
-  })
+  } catch (error) {
+    console.log("Error occurred:", error);
+    next(error);
+  }
 });
+
 router.get("/login", (req, res) => {
-  if (req.session.loggedIn) {
+  console.log(req.session,"session")
+  if (req.session.user) {
     res.redirect('/')
   } else
-    res.render("users/login", { "error": req.session.logError })
-  req.session.logError = false
+    res.render("users/login", { "error": req.session.userlogError })
+    console.log("wrong")
+  req.session.userlogError = false
 
 
 }
@@ -33,38 +46,50 @@ router.get("/signup", (req, res) => {
 }
 )
 router.post('/signup', (req, res) => {
-  userSignup.doSignup(req.body).then((data) => console.log(data), res.redirect("/login"))
+  userHelper.doSignup(req.body).then((data) =>{
+      req.session.user = data;
+      req.session.user.loggedIn = true;
+    console.log(data), 
+    res.redirect("/login")
+  } )
 
 
 })
 router.post("/login", (req, res) => {
-  userSignup.doLogin(req.body).then((data) => {
+  userHelper.doLogin(req.body).then((data)=>{
+    console.log(data,"data")
     if (data.status) {
-      console.log('Setting req.session.loggedIn');
-      req.session.loggedIn = true;
-      console.log('Setting req.session.user');
+      
       req.session.user = data.user;
-      console.log('req.session.user:', req.session.user);
-      console.log(data.user);
+      req.session.user.loggedIn = true;
       res.redirect("/")
     }
     else {
-      req.session.logError = "Invalid username or Password";
+      req.session.userlogError = "Invalid username or Password";
       res.redirect("/login")
 
 
     }
   })
+  
+  
 })
-router.get('/logout', (req, res) => {
-  req.session.destroy();
-  res.redirect("/login")
+router.get('/logout', async(req, res) => {
+   req.session.user=null;
+   res.redirect("/login")
 })
-router.get("/cart", (async (req, res) => {
+router.get("/cart",verifyUser, (async (req, res) => {
   const cart = await userHelper.AddToUsercart(req.session.user._id);
-  console.log(cart, "oomb")
-  let user = req.session.user
-  res.render('users/cart', { user, cart })
+  console.log(cart, "cart");
+  let amount=null;
+
+  if(cart.length>0){
+    amount=await userHelper.getAmount(req.session.user._id);
+    console.log(amount,"amount")
+  }
+    
+  let user =await req.session.user
+  res.render('users/cart', { user, cart ,amount})
 }))
 router.get('/Add-Products-Cart/:id', async (req, res) => {
   console.log("call came")
@@ -74,9 +99,72 @@ router.get('/Add-Products-Cart/:id', async (req, res) => {
 }),
 router.post("/change-quantity",async(req,res)=>{
   console.log("req body",req.body)
-  await userHelper.changeQuantity(req.body).then((response)=>{res.json(response)})
+  
+  await userHelper.changeQuantity((req.body)).then(async(response)=>{
+      response.total = await userHelper.getAmount(req.body.user);
+       res.json(response);
+       console.log(response)
+     
+  })
 })
 router.post("/remove",async(req,res)=>{
+  console.log("remove call invoked")
   await userHelper.remove(req.body).then((response)=>{res.json(response)})
+}),
+router.get("/placeOrderMsg",(async(req,res)=>{
+   res.render("users/orderPlaced");
+}))
+router.get("/placeOrder",async(req,res)=>{
+  await userHelper.getAmount(req.session.user._id).then((total)=>res.render("users/place-Order",{total,user:req.session.user}))
+   
 })
+router.post("/placeOrder", async (req, res) => {
+  try {
+    const product = await userHelper.getCartProducts(req.body.userId);
+    const totalAmount = await userHelper.getAmount(req.body.userId);
+   
+    await userHelper.placeOrder(req.body, product, totalAmount).then((orderID)=>{
+    
+      if(req.body.paymentMethod==="cashOnDelivary"){
+        res.json({codSuccess:true})
+      }else{
+        userHelper.razorPayIntegration(orderID,totalAmount).then((response)=>{
+          res.json({response})
+        })
+      }
+    
+    });
+   
+  } catch (error) {
+    // Handle any errors that occur during the order placement process
+    console.error(error);
+    res.status(500).send("Error placing the order.");
+  }
+  
+});
+router.get("/orders",async(req,res)=>{
+ const UserId=req.session.user._id
+ const product=await userHelper.listProducts(UserId);
+ 
+ console.log(product,"product")
+  res.render("users/orderList",{user:req.session.user,product})
+ 
+ 
+}),
+router.get("/orders/:prod_id",async(req,res)=>{
+  const prodId=req.params.prod_id
+  console.log(prodId) 
+  
+ }),
+ router.post("/verify-payment",(async(req,res)=>{
+  console.log(req.body['order[receipt]'],":.....j")
+  userHelper.verifyPayment(req.body).then(()=>{
+    userHelper.changePaymentStatus(req.body['order[receipt]']).then(()=>{
+      res.json({status:true})
+    })
+  }).catch((err)=>{
+    res.json({status:false})
+  })
+ }))
 module.exports = router;
+ 

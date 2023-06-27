@@ -1,36 +1,25 @@
- <section>
-          <div class="container mt-3 ">
-
-        <div class="row ">
-            {{#each product}}
-            
-
-            <div class=" col-md-3 col-sm-6 p-3 ">
-
-
-                <div class="card text-center" style="width: 17rem; height:36rem">
-                    <img src="/images/{{this._id}}.jpg" class=" mx-auto" width="200px" height="220px" alt="...">
-                    <div class="card-body">
-                        <h5 class="card-title">{{this.name}}</h5>
-                        <p class="card-text">{{this.description}}</p>
-                        <p class="card-text"><b> Rs {{this.price}}</b> </p>
-                            
-              
-                        <button class="btn btn-primary"  onclick= addToCart("{{_id}}")>Add to Cart </button>
-                    </div>
-                </div>
-
+<section>
+  <div class="container mt-3">
+    {{#if user._id}}
+      <div class="row">
+        {{#each product}}
+        <div class="col-md-3 col-sm-6 p-3">
+          <div class="card text-center" style="width: 17rem; height:36rem">
+            <img src="/images/{{_id}}.jpg" class="mx-auto" width="200px" height="220px" alt="...">
+            <div class="card-body">
+              <h5 class="card-title">{{name}}</h5>
+              <p class="card-text">{{description}}</p>
+              <p class="card-text"><b>Rs {{price}}</b></p>
+              <button class="btn btn-primary" onclick="addToCart('{{_id}}')">Add to Cart</button>
             </div>
-
-            {{/each}}
-           
-
-            </div>
-
-
-
+          </div>
         </div>
-        </div>
+        {{/each}}
+      </div>
+    {{else}}
+      <p> login.</p>
+    {{/if}}
+  </div>
+</section>
 
-    </section>
    

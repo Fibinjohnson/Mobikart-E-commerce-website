@@ -22,13 +22,57 @@
       <td>{{product.price}}</td>
       <td>{{product.category}}</td>
       
-      <td><button class="btn btn-outline-secondary me-2" id="minus" onclick="changeQuantity('{{_id}}','{{product._id}}',-1)" style="width: 50px;">-</button > <span id="{{product._id}}">{{index}}</span>  <button  class="btn btn-outline-secondary btn "  style="width: 50px;" onclick="changeQuantity('{{_id}}','{{product._id}}',1)" > + </button></td>
-      <td><p class="btn btn-danger" onclick="remove('{{_id}}','{{product._id}}')">Delete</p></td>
+      <td><button class="btn btn-outline-secondary me-2" id="minus" onclick="changeQuantity('{{_id}}','{{product._id}}','{{../user._id}}',-1)" style="width: 50px;">- </button >
+       <span id="{{product._id}}">{{index}}</span>  
+       <button  class="btn btn-outline-secondary btn "  style="width: 50px;" onclick="changeQuantity('{{_id}}','{{product._id}}','{{../user._id}}',1)" > + </button>
+       </td>
+
+      <td>
+        <p class="btn btn-danger" onclick="remove('{{_id}}','{{product._id}}')">Delete </p>
+
+      </td>
     </tr>
    
   </tbody>
   {{/each}}
 </table>
-<h3 class="d-flex justify-content-end me-5 ">Total:10,000/- </h3>
+<div><h4 class="d-flex justify-content-end me-5 ">Total: <span id="total">{{amount}}</span>/- </h3>
+<div style="padding: 9px;">
+  <a  type="button" class="btn btn-dark float-right"  href="/placeOrder">Proceed to buy</a>
+</div>
+ 
+</div>
+
 </div>
 </section>
+<script>
+   async function changeQuantity(Cartid,productId, userId,count){
+       let  quantity=parseInt(document.getElementById(productId).innerHTML)
+       count=parseInt(count)
+      console.log("required",userId)
+       
+       await $.ajax( 
+    
+      {
+       url:"/change-quantity",
+       data:{
+         cart:Cartid,product:productId,count:count,user:userId,quantity:quantity
+       },
+       type:"POST",
+       success:(response)=>{
+        if(response.removeStatus){
+          alert("product removed"),
+          location.reload()
+         
+        }else{
+          document.getElementById(productId).innerHTML=quantity+count;
+          document.getElementById("total").innerHTML=response.total;
+          
+          
+        }
+        
+       }
+      }
+    )
+  }
+</script>

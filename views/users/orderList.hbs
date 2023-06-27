@@ -1,0 +1,32 @@
+<section>
+    <table class="table">
+  <thead>
+    <tr>
+      <th scope="col">Ordered date</th>
+      <th scope="col">Address</th>
+      <th scope="col">Mobile</th>
+      <th scope="col">payment Method</th>
+       <th scope="col">Status</th>
+      <th scope="col">Total Amount</th>
+    </tr>
+  </thead>
+  <tbody>
+    {{#each product}}
+    <tr>
+      <th scope="row">{{delivaryDetails.formattedDate}}</th>
+      <td>{{delivaryDetails.address}}</td>
+      <td>{{delivaryDetails.mobileNo}}</td>
+      <td>{{userDetails.paymentMethod}}</td>
+      <td>{{userDetails.totalAmount}}</td>
+      <td>{{userDetails.status}}</td>
+      
+      <td>
+        <a class="btn btn-primary" href="/orders/{{this._id}}">view products</a>
+      
+      </td>
+      
+    </tr>
+      {{/each}}
+  </tbody>
+</table>
+</section>

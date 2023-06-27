@@ -10,12 +10,13 @@ var userRouter = require('./routes/user');
 var adminRouter = require('./routes/admin');
 const hbs = require("express-handlebars")
 const fileUpload=require("express-fileupload");
-var Session=require('express-session');
+const Session=require('express-session');
 var app = express();
 
 // view engine setup
-app.set('views', path.join(__dirname, 'views'));
 app.set('view engine', 'hbs');
+app.set('views', path.join(__dirname, 'views'));
+
 app.engine('hbs', hbs.engine({
   extname: 'hbs',
   defaultLayout: 'layout',
@@ -33,7 +34,9 @@ app.use(express.static(path.join(__dirname, 'public')));
 
 app.use(fileUpload());
 app.use(Session({ secret: 'session',
-cookie: { maxAge: 6000000 }
+cookie: { maxAge: 600000},
+saveUninitialized: true,
+resave:true
 }))
 
 

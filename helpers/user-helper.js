@@ -1,7 +1,9 @@
 const { connectToDB } = require("../config/connection");
 const collection=require("./collection")
-const bcrypt=require('bcrypt')
+const bcrypt=require('bcrypt');
 const{ObjectId}=require("mongodb")
+const RazorPay=require("razorpay")
+let instance = new RazorPay({ key_id: 'rzp_test_poYQA27SDAayai', key_secret: 'YuGH1sGwxlbs1mXWQLk103hj' })
 module.exports={
 doSignup:(userSignup)=>{
      return new Promise(async(resolve,reject)=>{
@@ -13,41 +15,44 @@ doSignup:(userSignup)=>{
 })},
 
 doLogin: (userLogin) => {
-    return new Promise(async (resolve, reject) => {
-        let response={};
-      try {
-        const database = await connectToDB();
-        const user = await database.collection(collection.userCollection).findOne({ email: userLogin.email });
-        
-        if (user) {
-          bcrypt.compare(userLogin.password, user.password, (error, result) => {
-            if (error) {
-              console.log("Error occurred during password comparison:", error);
-              resolve(false);
+  return new Promise(async (resolve, reject) => {
+    let response = {};
+    try {
+      const database = await connectToDB();
+      const user = await database.collection(collection.userCollection).findOne({ email: userLogin.email });
+
+      if (user) {
+        bcrypt.compare(userLogin.password, user.password, (error, result) => {
+          if (error) {
+            console.log("Error occurred during password comparison:", error);
+            reject(error);
+          } else {
+            if (result) {
+              console.log("Login successful");
+              response.user = user;
+             
+              response.status = true;
+              resolve(response);
             } else {
-              if (result) {
-                console.log("Login successful");
-                response.user=user;
-                response.status=true;
-                resolve(response);
-              } else {
-                console.log("Incorrect password");
-                
-                response.status=false;
-                resolve(response);
-              }
+              console.log("Incorrect password");
+              response.status = false;
+             
+              resolve(response);
             }
-          });
-        } else {
-          console.log("User not found");
-          resolve(false);
-        }
-      } catch (error) {
-        console.log("Error occurred during login:", error);
+          }
+        });
+      } else {
+        console.log("User not found");
         resolve(false);
       }
-    });
-  },
+    } catch (error) {
+      console.log("Error occurred during login:", error);
+      reject(error);
+    }
+  });
+}
+
+,
  addProductsCart:(userId,userProducts)=>{return new Promise(async(resolve,reject)=>{
   const prodObj={
     prodid:new ObjectId(userProducts),
@@ -60,15 +65,12 @@ doLogin: (userLogin) => {
     
 const database=await connectToDB();
 const userCart = await database.collection("newCart").findOne({ user: new ObjectId(userId) });
-// console.log('Before find toArray');
-// database.collection("newCart").find().toArray().then((res) => console.log(res));
-// console.log('After find toArray');
-
 if (userCart) {
-let index=userCart.product.findIndex((product)=> { console.log("consoling indexof",product.prodid,new ObjectId(userProducts));return  userProducts==product.prodid} )
-console.log(index)
+let index=userCart.product.findIndex((product)=> {
+  return  userProducts==product.prodid
+})
+
      if(index!==-1){
-      console.log("call invoked");
        await database
       .collection("newCart")
       .updateOne(
@@ -164,8 +166,12 @@ console.log(index)
       const database= await connectToDB();
       let Count=0;
       const cartCount=await database.collection("newCart").findOne({user:new ObjectId(userId)});
-      if(cartCount){
+      console.log(cartCount,"cartCount")
+      if(cartCount!=null){
         Count=cartCount.product.length;
+        resolve(Count)
+      }else{
+        Count=0,
         resolve(Count)
       }
 
@@ -173,8 +179,9 @@ console.log(index)
    },
   changeQuantity:(object)=>{
     
-    count=parseInt(object.count);
+   const  count=parseInt(object.count);
     quantity=parseInt(object.quantity)
+    console.log(object,"objecthhhhhhh")
     
     return new Promise(async(resolve,reject)=>{
       const database=await connectToDB();
@@ -192,7 +199,7 @@ console.log(index)
           { $inc: { "product.$.prodIndex": count } }
         ).then((response)=>{
          
-          resolve(true)
+          resolve({status:true})
         })
       }
     }
@@ -210,6 +217,159 @@ remove:(object)=>{
 
    })
    
+},
+getAmount:(userId)=>{
+  return new Promise(async(resolve,reject)=>{
+    try{
+      const database=await connectToDB();
+      const totalAmount=await database.collection("newCart").aggregate([
+        {
+          $match:{user: new ObjectId(userId) }
+        },
+        {
+          $unwind:"$product"
+        },
+        {
+          $project:{
+            item:"$product.prodid",
+            index:"$product.prodIndex"
+          }
+        },{
+          $lookup:{
+            from:collection.COLLECTION_NAME,
+            localField:"item",
+            foreignField:"_id",
+            as:"products"
+          }
+        },{
+          $project:{
+            item:1,index:1,product:{$arrayElemAt:['$products',0]}
+          }
+        },{
+          $group:{_id:null,total:{$sum:{$multiply:[  "$index",
+          { $toInt: { $replaceAll: { input: "$product.price", find: ",", replacement: "" } } }]}}}
+        }
+      ]).toArray()
+      console.log(totalAmount,"this")
+      let total = 0;
+if (totalAmount.length > 0) {
+  total = totalAmount[0].total || 0;
+ 
+} resolve(total)
+      
+     } catch (error) {
+        reject(error);
+      } 
+  })
+},
+getCartProducts:async(userId)=>{
+  return new Promise(async(resolve,reject)=>{
+    const database=await connectToDB();
+    const cart= await database.collection("newCart").findOne({user:new ObjectId(userId)})
+    resolve(cart.product)
+  })
+  
+},
+placeOrder:(order,product,amount)=>{
+  return new Promise(async(resolve,reject)=>{
+     console.log(order,product,amount)
+     let status=order.paymentMethod==="cashOnDelivary"?"placed":"pending"
+     const date = new Date();
+     const options = { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' };
+     const formattedDate = date.toLocaleDateString('en-US', options);
+
+      let orderObj={
+        delivaryDetails:{
+          name:order.name,
+          address:order.address,
+          mobileNo:order.mobile,
+          pinCode:order.inputZip,
+          formattedDate:formattedDate
+
+        },
+        userDetails:{
+          user: new ObjectId(order.userId),
+          paymentMethod:order.paymentMethod,
+          product:product,
+          status:status,
+          totalAmount:amount,
+        }
+     }
+     const database=await connectToDB();
+     await database.collection("placeOrder").insertOne(orderObj).then((response)=>{
+      //  database.collection("newCart").deleteOne({user:new ObjectId(order.userId)})
+       resolve(response.insertedId)
+       
+      })
+  })
+},
+listProducts:(userId)=>{return new Promise(async(resolve,reject)=>{
+     const database=await connectToDB();
+    const placedData=await  database.collection("placeOrder").find({"userDetails.user":new ObjectId(userId)}).toArray()
+    console.log(placedData,"data")
+    resolve(placedData)
+})
+
+},
+getProducts:(prodID)=>{return new Promise(async(resolve,reject)=>{
+  const database=await connectToDB();
+  const product= database.collection("product").find({_id:new ObjectId(prodID)}).toArray()
+  console.log(product)
+  resolve(product)
+})
+ 
+},
+razorPayIntegration:(orderId,totalAmount)=>{
+ 
+  return new Promise(async(resolve,reject)=>{
+    var options = {
+      amount: totalAmount*100,  // amount in the smallest currency unit
+      currency: "INR",
+      receipt: ""+orderId
+    };
+    instance.orders.create(options, function(err, order) {
+      if(err){
+        console.log(err)
+      }else{
+        console.log(order,":order");
+        resolve(order)
+      }
+      
+    });
+  })
+},
+verifyPayment: (details) => {
+  return new Promise((resolve, reject) => {
+    const crypto = require('crypto');
+    let hmac = crypto.createHmac('sha256', 'YuGH1sGwxlbs1mXWQLk103hj');
+    hmac.update(details['payment[razorpay_order_id]'] + '|' + details['payment[razorpay_payment_id]']);
+    hmac = hmac.digest("hex");
+    if (hmac === details['payment[razorpay_signature]']) {
+      console.log("payment success")
+      resolve();
+     
+    } else {
+      console.log("error occured in payment verificaation")
+      reject();
+      
+    }
+  });
+
+
+
+},
+changePaymentStatus:(receipt)=>{
+  return new Promise(async(resolve,reject)=>{
+    const database = await connectToDB();
+    database.collection("placeOrder").updateOne(
+      { _id: new ObjectId(receipt) },
+      { $set: { "userDetails.status": "placed" } }
+    ).then((response) => {
+      console.log(response);
+      resolve();
+    });
+    
+  })
 }
 
 

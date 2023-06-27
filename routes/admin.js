@@ -50,7 +50,23 @@ router.post('/edit-products/:id',(req,res)=>{
       res.redirect("/Admin")
     }
   })
-})
+});
+router.get("/login", (req, res) => {
+  console.log(req.session,"session")
+  if (req.session.user) {
+    res.redirect('/')
+  } else
+    res.render("Admin/adminLogin",{ "error": req.session.userlogError })
+    console.log("wrong")
+    req.session.userlogError = false
+
+
+});
+router.post("/login",(async(req,res)=>{
+  console.log(req.body);
+  productHelpers.doLogin(req.body).then(()=>{})
+}))
 
 
 module.exports = router;
+// , 

@@ -1,0 +1,161 @@
+
+<section class="row ms-3">
+  <div class="w-50 col">
+    <div class="d-flex justify-content-center">
+      <form id="form1" >
+        <div class="form-row">
+          <div class="form-group col-md-6">
+            <label for="inputEmail4">Name</label>
+            <input type="Name" class="form-control" name="name" id="inputEmail4" placeholder="Name">
+          </div>
+        </div>
+        <div class="form-group">
+          <label for="inputAddress">Address</label>
+          <input type="text" name="address" class="form-control" id="inputAddress" placeholder="street/road">
+        </div>
+      
+        <div class="form-row">
+          <div class="form-group col-md-6">
+            <label for="Mobile">mobile no</label>
+            <input type="text" class="form-control" name="mobile">
+          </div>
+          <div class="form-group col-md-4">
+            <label for="inputState">State</label>
+            <select name="inputState" class="form-control">
+              <option selected>Choose...</option>
+              <option>Kerala</option>
+              <option>TamilNadu</option>
+            </select>
+          </div>
+          <div class="form-group col-md-2">
+            <label for="inputZip">Zip</label>
+            <input type="text" class="form-control" name="inputZip">
+          </div>
+        </div>
+        <div class="form-group">
+          <div class="form-check">
+            <input class="form-check-input" type="checkbox" name="gridCheck">
+            <label class="form-check-label" for="gridCheck">
+              Check me out
+            </label>
+            <input type="text" name="userId" value="{{user._id}}" hidden>
+            <div class="text-center">
+          <button type="submit" class=" btn btn-dark">Confirm Payment</button>
+        </div>
+          </div>
+        </div>
+      
+    </div>
+  </div>
+  <div class="col border border-dark">
+    <div class="">
+      <div class="mt-5">
+        <div class="pt-3">
+          <h5 class="">item Amount:33000rs</h5>
+          <h5 class="">No items:33000rs</h5>
+          <h5 class="">Total Amount:{{total}}</h3>
+        </div>
+      </div>
+      
+      <div class="mt-5 p-auto">
+        <h4>Select Payment Method</h4>
+        <div class="form-check">
+          <input class="form-check-input" type="radio" name="paymentMethod" id="cashOnDelivary" value="cashOnDelivary" checked>
+          <label class="form-check-label" for="cashOnDelivary">
+            Cash on Delivery
+          </label>
+        </div>
+        <div class="form-check">
+          <input class="form-check-input" type="radio" name="paymentMethod" id="onLinePayment" value="onLinePayment">
+          <label class="form-check-label" for="onLinePayment">
+            Online Payment
+          </label>
+        </div>
+      </div>
+      </form>
+      <div class="p-3 ms-3">
+        
+      </div>
+    </div>
+  </div>
+</section>
+
+<script>
+$(document).ready(function() {
+  $('#form1').submit((e)=>{
+    e.preventDefault();
+    $.ajax({
+      url: "/placeOrder",
+      type: "POST",
+      data: $("#form1").serialize(),
+      success: function(response) {
+        if(response.codSuccess){
+        location.href = "/placeOrderMsg"; // Replace "/path" with the actual path you want to redirect to
+       }else{
+         razorPayment(response.response)
+         
+       }
+      },
+    });
+  });
+});
+function razorPayment(order){
+let newOrderAmt=order.amount*100;
+  var options = {
+    "key": "rzp_test_poYQA27SDAayai", // Enter the Key ID generated from the Dashboard
+    "amount":newOrderAmt, // Amount is in currency subunits. Default currency is INR. Hence, 50000 refers to 50000 paise
+    "currency": "INR",
+    "name": "MobiKart",
+    "description": "Test Transaction",
+    "image": "https://example.com/your_logo",
+    "order_id": order.id, //This is a sample Order ID. Pass the `id` obtained in the response of Step 1
+    "handler": function (response){
+       
+        verifyPayment(response,order)
+    },
+    "prefill": {
+        "name": "Gaurav Kumar",
+        "email": "gaurav.kumar@example.com",
+        "contact": "9000090000"
+    },
+    "notes": {
+        "address": "Razorpay Corporate Office"
+    },
+    "theme": {
+        "color": "#3399cc"
+    }
+};
+var rzp1 = new Razorpay(options);
+rzp1.open();
+}
+
+function verifyPayment(payment,order){
+  $.ajax({
+     
+    url:"/verify-payment",
+    type:"post",
+    data:{payment,order},
+       success: function(response) {
+        if(response.status){
+        location.href = "/placeOrderMsg"; // Replace "/path" with the actual path you want to redirect to
+       }
+      },
+   
+  })
+}
+</script>
+
+
+
+
+ {{!-- $.ajax({
+              url:"/order-Placed",
+              type:"get"
+              location.href=url
+           
+            }) --}}
+
+ {{!-- alert(response.razorpay_payment_id);
+        alert(response.razorpay_order_id);
+        alert(response.razorpay_signature); --}}
+

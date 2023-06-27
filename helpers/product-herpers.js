@@ -21,9 +21,10 @@ module.exports = {
       console.error('Error adding product:', error);
     }
   },
-  listAdminProducts:()=>{ return new Promise(async(resolve,reject)=>{
+  listAdminProducts:()=>{ 
+    return new Promise(async(resolve,reject)=>{
    const database=await connectToDB()
-   let adminProducts=  database.collection(collection.COLLECTION_NAME).find().toArray()
+   let adminProducts=  await database.collection(collection.COLLECTION_NAME).find().toArray()
    resolve(adminProducts)
    console.log(adminProducts);
   })
@@ -59,6 +60,15 @@ module.exports = {
         price:products.price
       }
     }).then((product)=>resolve(product))
+    })
+  },
+  doLogin:(data)=>{
+    return new Promise(async(resolve,reject)=>{
+      const database=await connectToDB();
+      await database.collection("AdminData").findOne({email:data.email}).then((response)=>{
+        console.log(response)
+        resolve(response)
+      })
     })
   }
   
