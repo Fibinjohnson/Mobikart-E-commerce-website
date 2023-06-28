@@ -1,7 +1,7 @@
 <section>
 <div class="container">
     <a href="Admin/add-products" class="btn btn-success mt-4 mb-4y">Add products</a>
-    <table class="table">
+    <table class="table" id="adminTables">
   <thead>
     <tr>
       <th scope="col">Sl no</th>
@@ -37,3 +37,8 @@
 </div>
 
 </section>
+<script>
+  $(document).ready( function () {
+    $('#adminTables').DataTable();
+} );
+</script>

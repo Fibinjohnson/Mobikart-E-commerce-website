@@ -1,0 +1,37 @@
+
+   
+
+<table class="table" id="orderList">
+  <thead>
+    <tr>
+     
+      <th scope="col">Name</th>
+      <th scope="col"> Mobile No</th>
+      <th scope="col">Order Status</th>
+      <th scope="col">Total Amount</th>
+       <th scope="col">Products</th>
+    </tr>
+  </thead>
+<tbody>
+    {{#each orders}}
+    <tr>
+      <td>{{name}}</td>
+      <td>{{MobileNo}}</td>
+      <td>{{status}}</td>
+      <td>{{totalAmount}}</td>
+  <td>
+  {{#each this.products}}
+    {{this.name}}
+    {{#if @last}}{{else}}, {{/if}}
+  {{/each}}
+</td>
+         
+    </tr>
+    {{/each}}
+  </tbody>
+</table>
+<script>
+  $(document).ready( function () {
+    $('#orderList').DataTable();
+} );
+</script>

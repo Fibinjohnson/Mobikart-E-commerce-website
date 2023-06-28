@@ -1,14 +1,25 @@
 const express = require('express');
+const nodemailer = require("nodemailer");
 const router = express.Router();
 const products = require("../helpers/product-herpers")
 const userHelper = require('../helpers/user-helper');
 const verifyUser=(req,res,next)=>{
-   if(req.session.user.loggedIn){
+   if(req.session.userloggedIn){
      next()
    }else{
     redirect("/login")
    }
-}
+};
+const generateOTP = () => {
+  const OTP_LENGTH = 6;
+  const charset = '0123456789';
+  let otp = '';
+  for (let i = 0; i < OTP_LENGTH; i++) {
+    const randomIndex = Math.floor(Math.random() * charset.length);
+    otp += charset[randomIndex];
+  }
+  return otp;
+};
 
 router.get('/', async (req, res, next) =>{
   try {
@@ -48,7 +59,7 @@ router.get("/signup", (req, res) => {
 router.post('/signup', (req, res) => {
   userHelper.doSignup(req.body).then((data) =>{
       req.session.user = data;
-      req.session.user.loggedIn = true;
+      req.session.userloggedIn = true;
     console.log(data), 
     res.redirect("/login")
   } )
@@ -61,7 +72,7 @@ router.post("/login", (req, res) => {
     if (data.status) {
       
       req.session.user = data.user;
-      req.session.user.loggedIn = true;
+      req.session.userloggedIn = true;
       res.redirect("/")
     }
     else {

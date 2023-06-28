@@ -5,14 +5,22 @@ var productHelpers=require("../helpers/product-herpers");
 
 /* GET users listing. */
 router.get('/', function(req, res, next) {
-productHelpers.listAdminProducts().then((product)=>{
-  res.render('Admin/add-products', {admin:true ,product});
-})
+  if(req.session.admin){
+    const Details=req.session.admin;
+    productHelpers.listAdminProducts().then((product)=>{
+      res.render('Admin/add-products', {admin:true ,product ,Details});
+    })
+  }else{
+    res.redirect('/Admin/login')
+  }
+
 });
+
 router.get('/add-products',(req,res)=>{
   res.render('Admin/add-product-form'
   )
 });
+
 router.post("/add-products",(req,res)=>{
    
   productHelpers.addProducts(req.body,((image)=>{
@@ -52,19 +60,58 @@ router.post('/edit-products/:id',(req,res)=>{
   })
 });
 router.get("/login", (req, res) => {
-  console.log(req.session,"session")
-  if (req.session.user) {
-    res.redirect('/')
+ 
+  if (req.session.admin) {
+    console.log(req.session.admin,"console")
+    res.redirect('/Admin')
   } else
-    res.render("Admin/adminLogin",{ "error": req.session.userlogError })
+  console.log("elsecase called")
+  console.log(req.session.adminlogError,"err")
+    res.render("Admin/adminLogin",{ "error": req.session.adminlogError })
     console.log("wrong")
-    req.session.userlogError = false
+    req.session.adminlogError = false
 
 
 });
 router.post("/login",(async(req,res)=>{
   console.log(req.body);
-  productHelpers.doLogin(req.body).then(()=>{})
+  productHelpers.doLogin(req.body).then((data)=>{
+    
+    if(data.status){
+      req.session.admin=data;
+      res.redirect("/Admin")
+    }else{
+      req.session.adminlogError="invalid password";
+      res.redirect('/Admin/login')
+    }
+  })
+}));
+router.get("/logout",((req,res)=>{
+  req.session.admin=null;
+  res.redirect('/Admin/login')
+  
+}))
+router.get("/users",(async(req,res)=>{
+  productHelpers.getUsers().then((users)=>{
+   
+    const processedUsers = users.map(user => {
+    const nameParts = user.name.trim().split(' ');
+  return {
+    ...user,
+    firstName: nameParts.shift(),
+    lastName: nameParts.join(' ')
+  };
+});
+   const Details=req.session.admin;
+   res.render('Admin/usersList',{ admin:true ,processedUsers,Details})
+  })
+})),
+router.get("/orders",(async(req,res)=>{
+  productHelpers.getOrders().then((orders)=>{
+    const Details=req.session.admin;
+
+    res.render('Admin/orderList',{ admin:true ,Details,orders})
+  })
 }))
 
 
