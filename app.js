@@ -12,6 +12,7 @@ const hbs = require("express-handlebars")
 const fileUpload=require("express-fileupload");
 const Session=require('express-session');
 var app = express();
+require('dotenv').config();
 // const accountSid = process.env.AccountSID;
 // const authToken = process.env.AuthToken;
 // const subaccountSid = process.env.VA1f8679b28cd77c047a68fa7ae8a9fefb

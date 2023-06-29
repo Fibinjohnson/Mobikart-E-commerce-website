@@ -1,34 +1,86 @@
-<div class="container mt-4  d-flex  justify-content-center">
-        <div class="card" style="width: 18rem;">            
-            <div class="card-header">Register Form</div>    
-            <div class="card-body">
-                <form action="/signup" method="POST">
-                    <div class="mb-3">
-                        <label for="name-reg" class="form-label">Name</label>
-                        <input type="text" class="form-control" id="name-reg" name="name">                        
-                    </div>
-                    <div class="mb-3">
-                        <label for="email-reg" class="form-label">Email</label>
-                        <input type="text" class="form-control" id="email-reg" name="email">                        
-                    </div>
-                     <div class="mb-3">
-                        <label for="email-reg" class="form-label">Phnone No</label>
-                        <input type="number" class="form-control" id="email-reg" name="Phone">                        
-                    </div>
-                    <div class="mb-3">
-                        <label for="password-reg" class="form-label">Password</label>
-                        <input type="password" class="form-control" id="password-reg" name="password">
-                    </div>
-                    <div class="mb-3">
-                        <label for="password-conf-reg" class="form-label">Confirm Password</label>
-                        <input type="password" class="form-control" id="password-conf-reg" name="passwordconfirm">
-                    </div>
-                    <div><a href="/login">Already have an account...?</a></div>
-                    <div class="d-flex  justify-content-center mt-3">
-                        <button type="submit" class="btn btn-primary ">Submit</button>
-                    </div>
-                    
-                </form>
-            </div>
+<div class="container mt-4 d-flex justify-content-center">
+  <div class="card" style="width: 18rem;">
+    <div class="card-header">Register Form</div>
+    <div class="card-body">
+      <form action="/signup" method="POST" onsubmit="return validate()">
+        <div class="mb-3">
+          <label for="name-reg" class="form-label">Name</label>
+          <input type="text" class="form-control" id="name-reg" name="name">
         </div>
+        <div class="mb-3">
+          <label for="email-reg" class="form-label">Email</label>
+          <input type="text" class="form-control" id="email-reg" name="email">
+        </div>
+        <div class="mb-3">
+          <label for="phone-reg" class="form-label">Phone No</label>
+          <input type="number" class="form-control" id="phone-reg" name="phone">
+        </div>
+        <div class="mb-3">
+          <label for="password-reg" class="form-label">Password</label>
+          <input type="password" class="form-control" id="password-reg" name="password">
+        </div>
+        <div class="mb-3">
+          <label for="password-conf-reg" class="form-label">Confirm Password</label>
+          <input type="password" class="form-control" id="password-conf-reg" name="passwordconfirm">
+        </div>
+        <div><a href="/login">Already have an account...?</a></div>
+        <div class="d-flex justify-content-center mt-3">
+          <button type="submit" class="btn btn-primary">Submit</button>
+        </div>
+        <p style="color: red; margin-top: 20px;" id="error-message"></p>
+        <p style="color:green; margin-top:20px;">{{messageEmail}}</p>
+      </form>
     </div>
+  </div>
+</div>
+
+<script>
+  function validate() {
+    var name = document.getElementById("name-reg").value;
+    var email = document.getElementById("email-reg").value;
+    var phone = document.getElementById("phone-reg").value;
+    var password = document.getElementById("password-reg").value;
+    var cpassword = document.getElementById("password-conf-reg").value;
+
+    var reg = /^\w+([\.-]?\w+)*@\w+([\.-]?\w+)*(\.\w{2,3})+$/;
+   var nameerror = /^[A-Za-z\s]+$/;
+    var phoneerror = /^[0-9]{10}$/;
+    var passworderror = /^(?=.*[A-Z])(?=.*[!@#$%^&*])(?=.{8,})/;
+    var error = document.getElementById("error-message");
+
+    if (name === "") {
+      error.innerHTML = "Please enter your name";
+      return false;
+    }
+    if (nameerror.test(name) === false) {
+      error.innerHTML = "Invalid name";
+      return false;
+    }
+    if (name.length < 5) {
+      error.innerHTML = "Name should contain at least 5 characters";
+      return false;
+    }
+    if (email === "") {
+      error.innerHTML = "Please enter your email id";
+      return false;
+    }
+    if (reg.test(email) === false) {
+      error.innerHTML = "Invalid email id";
+      return false;
+    }
+    if (phoneerror.test(phone) === false) {
+      error.innerHTML = "Phone number should contain 10 digits";
+      return false;
+    }
+    if (passworderror.test(password) === false) {
+      error.innerHTML =
+        "Password must contain 8 characters, at least one special character, and at least one uppercase letter";
+      return false;
+    }
+    if (password !== cpassword) {
+      error.innerHTML = "Both passwords do not match";
+      return false;
+    }
+    return true;
+  }
+</script>

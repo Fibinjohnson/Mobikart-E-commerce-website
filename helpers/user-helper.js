@@ -3,15 +3,20 @@ const collection=require("./collection")
 const bcrypt=require('bcrypt');
 const{ObjectId}=require("mongodb")
 const RazorPay=require("razorpay")
+const nodemailer=require("nodemailer");
 let instance = new RazorPay({ key_id: 'rzp_test_poYQA27SDAayai', key_secret: 'YuGH1sGwxlbs1mXWQLk103hj' })
+require('dotenv').config();
+
 module.exports={
 doSignup:(userSignup)=>{
      return new Promise(async(resolve,reject)=>{
-    userSignup.password= await bcrypt.hash(userSignup.password,10);
-    userSignup.passwordconfirm= await bcrypt.hash(userSignup.password,10);
-    const database= await connectToDB();
-   database.collection(collection.userCollection).insertOne(userSignup).then((userData)=> resolve(userData.insertedId)
-    )    
+      
+        userSignup.password= await bcrypt.hash(userSignup.password,10);
+        userSignup.passwordconfirm= await bcrypt.hash(userSignup.password,10);
+        const database= await connectToDB();
+       database.collection(collection.userCollection).insertOne(userSignup).then((userData)=> resolve(userData.insertedId)) 
+      
+   
 })},
 
 doLogin: (userLogin) => {
@@ -370,6 +375,66 @@ changePaymentStatus:(receipt)=>{
     });
     
   })
+},
+
+sendVerification:(email,username,otp)=>{
+  try{
+    const transporter = nodemailer.createTransport({
+      host: "smtp.gmail.com",
+      port: 587,
+      secure: false,
+      requireTLS: true,
+      auth: {
+        user: process.env.EMAILID,
+        pass: process.env.PASSWORD,
+      }
+    });
+    const mailOption = {
+      from: process.env.EMAILID,
+      to: email,
+      subject: "for verification mail",
+      html:
+        "<p>Hii," +
+        username +
+        ",Your otp for login is <h1>" +
+        otp +
+        "</h1></p>",
+    };
+    transporter.sendMail(mailOption, (error, info) => {
+      if (error) {
+        console.log(error);
+      } else {
+        console.log("email send", info.response);
+        
+      }
+    });
+  }catch(error){
+     console.log(error)
+  }
+},
+findDuplication:(Email)=>{
+return new Promise(async(resolve,reject)=>{
+   const db=await connectToDB();
+   const findEmail=await db.collection("users").findOne({email:Email});
+   resolve(findEmail)
+  
+})
+},
+searchProducts: async (product) => {
+  return new Promise(async(resolve,reject)=>{
+    const database = await connectToDB();
+    const searchQuery = new RegExp(product.search, 'i');
+   // 'i' flag for case-insensitive search
+    const searchResults = await database.collection("Product").find({
+      $or: [
+        { name: searchQuery  },
+        {category:searchQuery}
+        
+      ]
+    }).toArray();
+    resolve(searchResults) ;
+  })
+
 }
 
 

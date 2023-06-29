@@ -1,0 +1,36 @@
+   <link rel="stylesheet" href="stylesheets/style.css">
+   <div class="containerone">
+      {{!-- <div class="forms-container"> --}}
+        <div class="signin-signup">
+          <form action="/otpsubmit" class="sign-in-form" method="post">
+            <h2 class="title">One Time Password</h2>
+            <div class="input-field">
+              <i class="fas fa-user"></i>
+              <input type="text"name="otp" placeholder="otp" />
+            </div>
+            <input type="submit" value="submit" class="btn solid " />
+            <p style="color: red;margin-top: 20px;">{{message}}</p>
+                                <div class="text-center mt-5">
+                                <span class="d-block mobile-text" id="countdown"></span>
+                                <a href="/resendOtp"><span class="d-block mobile-text" id="resend"></span></a>
+                            </div>
+          </form>
+          </div>
+
+      <div class="panels-container">
+        <div class="panel left-panel">
+          <div class="content">
+            <h3>New here ?</h3>
+            <p>
+              "Join our ecommerce community today! Create an account and 
+              start enjoying exclusive deals and promotions."
+            </p>
+            <a href="/signup"><button class="btn transparent" id="sign-up-btn">
+              Sign up
+            </button></a>
+    </div>
+      
+      <script src="/javascripts/timer.js">
+   
+      </script>
+      
