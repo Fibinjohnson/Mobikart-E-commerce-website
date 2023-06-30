@@ -1,12 +1,12 @@
 
-<section class="row ms-3">
+<section class="row ms-3 mt-5" >
   <div class="w-50 col">
     <div class="d-flex justify-content-center">
-      <form id="form1" >
+      <form id="form1"> 
         <div class="form-row">
           <div class="form-group col-md-6">
             <label for="inputEmail4">Name</label>
-            <input type="Name" class="form-control" name="name" id="inputEmail4" placeholder="Name">
+            <input type="Name" class="form-control" name="name" id="name" placeholder="Name">
           </div>
         </div>
         <div class="form-group">
@@ -17,11 +17,11 @@
         <div class="form-row">
           <div class="form-group col-md-6">
             <label for="Mobile">mobile no</label>
-            <input type="text" class="form-control" name="mobile">
+            <input type="text" class="form-control" name="mobile" id="mobile">
           </div>
           <div class="form-group col-md-4">
             <label for="inputState">State</label>
-            <select name="inputState" class="form-control">
+            <select name="inputState" id="state" class="form-control">
               <option selected>Choose...</option>
               <option>Kerala</option>
               <option>TamilNadu</option>
@@ -29,44 +29,41 @@
           </div>
           <div class="form-group col-md-2">
             <label for="inputZip">Zip</label>
-            <input type="text" class="form-control" name="inputZip">
+            <input type="text" class="form-control" id="zip" name="inputZip">
           </div>
         </div>
         <div class="form-group">
           <div class="form-check">
-            <input class="form-check-input" type="checkbox" name="gridCheck">
-            <label class="form-check-label" for="gridCheck">
-              Check me out
-            </label>
+            
             <input type="text" name="userId" value="{{user._id}}" hidden>
             <div class="text-center">
           <button type="submit" class=" btn btn-dark">Confirm Payment</button>
         </div>
+        <div id="error-message" style="color: red;"> </div>
           </div>
         </div>
       
     </div>
   </div>
-  <div class="col border border-dark">
+  <div class="col border border-dark  me-5">
     <div class="">
       <div class="mt-5">
         <div class="pt-3">
-          <h5 class="">item Amount:33000rs</h5>
-          <h5 class="">No items:33000rs</h5>
-          <h5 class="">Total Amount:{{total}}</h3>
+          
+          <h5 class="">Total Amount:{{total}}INR</h3>
         </div>
       </div>
       
       <div class="mt-5 p-auto">
         <h4>Select Payment Method</h4>
         <div class="form-check">
-          <input class="form-check-input" type="radio" name="paymentMethod" id="cashOnDelivary" value="cashOnDelivary" checked>
+          <input class="form-check-input" type="radio" name="paymentMethod" id="cashOnDelivary" value="COD" checked>
           <label class="form-check-label" for="cashOnDelivary">
             Cash on Delivery
           </label>
         </div>
         <div class="form-check">
-          <input class="form-check-input" type="radio" name="paymentMethod" id="onLinePayment" value="onLinePayment">
+          <input class="form-check-input" type="radio" name="paymentMethod" id="onLinePayment" value="OnlinePayment">
           <label class="form-check-label" for="onLinePayment">
             Online Payment
           </label>
@@ -74,16 +71,23 @@
       </div>
       </form>
       <div class="p-3 ms-3">
-        
+       
       </div>
+       
     </div>
+   
   </div>
+   
 </section>
 
 <script>
+  
 $(document).ready(function() {
   $('#form1').submit((e)=>{
-    e.preventDefault();
+    
+     e.preventDefault();
+    if(validate()){
+   
     $.ajax({
       url: "/placeOrder",
       type: "POST",
@@ -97,6 +101,9 @@ $(document).ready(function() {
        }
       },
     });
+    }else {
+      console.log("error is here")
+    }
   });
 });
 function razorPayment(order){
@@ -137,12 +144,52 @@ function verifyPayment(payment,order){
     data:{payment,order},
        success: function(response) {
         if(response.status){
-        location.href = "/placeOrderMsg"; // Replace "/path" with the actual path you want to redirect to
+        location.href = "/placeOrderMsg"; 
        }
       },
    
   })
 }
+
+
+  function validate() {
+    var name = document.getElementById("name").value;
+    var email = document.getElementById("inputAddress").value;
+    var phone = document.getElementById("mobile").value;
+    var state = document.getElementById("state").value;
+    var zip = document.getElementById("zip").value;
+
+    var reg = /^\w+([\.-]?\w+)*@\w+([\.-]?\w+)*(\.\w{2,3})+$/;
+   var nameerror = /^[A-Za-z\s]+$/;
+    var phoneerror = /^[0-9]{10}$/;
+    var error = document.getElementById("error-message");
+
+    if (name === "") {
+      error.innerHTML = "Please enter your name";
+      return false;
+    }
+    if (nameerror.test(name) === false) {
+      error.innerHTML = "Invalid name";
+      return false;
+    }
+    if (name.length < 5) {
+      error.innerHTML = "Name should contain at least 5 characters";
+      return false;
+    }
+    if (email === "") {
+      error.innerHTML = "Please enter your email id";
+      return false;
+    }
+    
+    if (phoneerror.test(phone) === false) {
+      error.innerHTML = "Phone number should contain 10 digits";
+      return false;
+    }
+  
+   
+    return true;
+  }
+
 </script>
 
 

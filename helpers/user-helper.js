@@ -278,7 +278,7 @@ getCartProducts:async(userId)=>{
 placeOrder:(order,product,amount)=>{
   return new Promise(async(resolve,reject)=>{
      console.log(order,product,amount)
-     let status=order.paymentMethod==="cashOnDelivary"?"placed":"pending"
+     let status=order.paymentMethod==="COD"?"placed":"pending"
      const date = new Date();
      const options = { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' };
      const formattedDate = date.toLocaleDateString('en-US', options);
@@ -302,7 +302,7 @@ placeOrder:(order,product,amount)=>{
      }
      const database=await connectToDB();
      await database.collection("placeOrder").insertOne(orderObj).then((response)=>{
-      //  database.collection("newCart").deleteOne({user:new ObjectId(order.userId)})
+       database.collection("newCart").deleteOne({user:new ObjectId(order.userId)})
        resolve(response.insertedId)
        
       })
@@ -435,6 +435,45 @@ searchProducts: async (product) => {
     resolve(searchResults) ;
   })
 
+},
+getPlacedProducts:(placedId)=>{
+return new Promise(async(resolve,reject)=>{
+  const database=await connectToDB();
+     const placedOrderList= await database.collection('placeOrder').aggregate([
+   {
+     $match:{
+      _id:new ObjectId(placedId)
+     }
+    },
+    {
+      $unwind:"$userDetails.product"
+      
+    },
+    {
+      $project:{
+        item:"$userDetails.product.prodid",
+        index:"$userDetails.product.prodIndex"
+      }
+    },{
+      $lookup:
+        {
+          from: "Product",
+          localField: 'item',
+          foreignField: "_id",
+          as: "placedProductsArray"
+        }
+    },
+   {
+    $project:{
+      item:1,
+      index:1,
+      placedProducts:{$arrayElemAt:["$placedProductsArray",0]}
+    }
+   }
+  ]).toArray()
+  
+resolve(placedOrderList)
+})
 }
 
 

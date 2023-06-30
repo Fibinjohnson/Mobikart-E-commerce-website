@@ -1,4 +1,4 @@
-<div class="container mt-4 d-flex  justify-content-center pt-5">
+{{!-- <div class="container mt-4 d-flex  justify-content-center pt-5">
         <div class="card " style="width: 18rem;">            
             <div class="card-header">Login Form</div>    
             <div class="card-body">
@@ -25,4 +25,40 @@
                 </form>
             </div>
         </div>
+    </div> --}}
+
+
+    
+    <div class="containerone">
+      {{!-- <div class="forms-container"> --}}
+        <div class="signin-signup">
+          <form action="/login" class="sign-in-form" name="submit" onclick="return validate()" method="post">
+            <h2 class="title">Sign in</h2>
+            <div class="input-field">
+              <i class="fas fa-user"></i>
+              <input type="text"name="email" placeholder="email" id="email" />
+            </div>
+            <div class="input-field">
+              <i class="fas fa-lock"></i>
+              <input type="password" name="password" id="password" placeholder="Password" />
+            </div>
+            <input type="submit" value="Login" class="btn solid" />
+            {{#if error}}
+            <p style="color: red;margin-top: 20px;" id="error-message">{{error}}</p>
+            {{/if}}
+          </form>
+          </div>
+
+      <div class="panels-container">
+        <div class="panel left-panel">
+          <div class="content">
+            <h3>New here ?</h3>
+            <p>
+              "Join our ecommerce community today! Create an account and 
+              start enjoying exclusive deals and promotions."
+            </p>
+            <a href="/signup"><button class="btn transparent" id="sign-up-btn">
+              Sign up
+            </button></a>
     </div>
+    

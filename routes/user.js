@@ -21,6 +21,7 @@ router.get('/', async (req, res, next) => {
     if (user) {
       let count = 0
       count = await userHelper.getCartCount(user._id);
+      req.session.user.count=count;
       console.log(count, "count")
       res.render('users/index', { product, user, count });
     } else {
@@ -107,18 +108,27 @@ router.get('/logout', async (req, res) => {
   res.redirect("/login")
 })
 
-router.get("/cart", verifyUser, (async (req, res) => {
-  const cart = await userHelper.AddToUsercart(req.session.user._id);
-  console.log(cart, "cart");
-  let amount = null;
+router.get("/cart", verifyUser, async (req, res) => {
+  
+  // console.log(user, "cartTime user");
+  
+  // if (user) {
+    const cart = await userHelper.AddToUsercart(req.session.user._id);
+    console.log(cart, "cart");
+    let amount = null;
+    
+    if (cart.length > 0) {
+      amount = await userHelper.getAmount(req.session.user._id);
+      console.log(amount, "amount");
+      let user = await req.session.user;
+      res.render('users/cart', { user, cart, amount });
+    } else {
+      res.render("users/emptyCart");
+    }
+  
+});
 
-  if (cart.length > 0) {
-    amount = await userHelper.getAmount(req.session.user._id);
-    console.log(amount, "amount")
-  }
-  let user = await req.session.user
-  res.render('users/cart', { user, cart, amount })
-}))
+
 router.get('/Add-Products-Cart/:id', async (req, res) => {
   console.log("call came")
   await userHelper.addProductsCart(req.session.user._id, req.params.id).then(() => {
@@ -158,7 +168,7 @@ router.post("/placeOrder", async (req, res) => {
 
     await userHelper.placeOrder(req.body, product, totalAmount).then((orderID) => {
 
-      if (req.body.paymentMethod === "cashOnDelivary") {
+      if (req.body.paymentMethod === "COD") {
         res.json({ codSuccess: true })
       } else {
         userHelper.razorPayIntegration(orderID, totalAmount).then((response) => {
@@ -190,7 +200,13 @@ router.get("/orders", async (req, res) => {
 
   router.get("/orders/:prod_id", async (req, res) => {
     const prodId = req.params.prod_id
+    let user = req.session.user;
     console.log(prodId)
+   await userHelper.getPlacedProducts(prodId).then((placedOrderList)=>{
+    console.log(placedOrderList[0])
+    res.render("users/orderedProductList",{placedOrderList,user})
+   })
+   
 
   }),
   router.post("/verify-payment", (async (req, res) => {
@@ -208,7 +224,8 @@ router.get("/orders", async (req, res) => {
     console.log(req.body)
    const SearchList= await userHelper.searchProducts(req.body)
    console.log(SearchList,"SearchList")
-   res.render("users/searchResults",{SearchList,user})
+   let count =req.session.user.count;
+   res.render("users/searchResults",{SearchList,user,count})
   }))
 
 

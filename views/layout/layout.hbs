@@ -15,24 +15,28 @@
             
     <link rel="stylesheet" href="https://cdn.datatables.net/1.13.4/css/jquery.dataTables.min.css">
     <script src="https://cdn.datatables.net/1.13.4/js/jquery.dataTables.min.js"></script>
-       <link rel="stylesheet" href="/stylesheets/style.css">
-            
-
+      {{#if admin}}
+      <link rel="stylesheet" href="stylesheets/style.css">
+      {{/if}}
+      {{#if user}}
+      <link rel="stylesheet" href="stylesheets/style.css">
+      {{/if}}
+       {{#if notHome}}
+         <link rel="stylesheet" href="stylesheets/otp.css">
+       {{/if}}
     <title>shopping cart</title>
+    <style>
+        
+    </style>
 </head>
 
 <body>
  {{#if admin}}
  {{>admin-header}}
  {{/if}}
-
- {{#if notHome}}
- {{>note-home-header}}
- {{else}}
-
+ {{#if user}}
  {{>user-header}}
  {{/if}}
-
 {{{body}}}
 
 
