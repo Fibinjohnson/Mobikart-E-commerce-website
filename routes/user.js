@@ -109,31 +109,53 @@ router.get('/logout', async (req, res) => {
 })
 
 router.get("/cart", verifyUser, async (req, res) => {
+  try{
+    
+    if(req.session.user){
+      const cart = await userHelper.AddToUsercart(req.session.user._id);
+      console.log(cart, "cart");
+      let amount = null;
+      
+      if (cart.length > 0) {
+        amount = await userHelper.getAmount(req.session.user._id);
+        console.log(amount, "amount");
+        let user = await req.session.user;
+        res.render('users/cart', { user, cart, amount });
+      } else {
+        res.render("users/emptyCart");
+      }
+    }else{
+      res.redirect('/login')
+    }
+   
+  }catch(error){
+      console.log("cartEroor",error)
+  }
   
   // console.log(user, "cartTime user");
   
   // if (user) {
-    const cart = await userHelper.AddToUsercart(req.session.user._id);
-    console.log(cart, "cart");
-    let amount = null;
-    
-    if (cart.length > 0) {
-      amount = await userHelper.getAmount(req.session.user._id);
-      console.log(amount, "amount");
-      let user = await req.session.user;
-      res.render('users/cart', { user, cart, amount });
-    } else {
-      res.render("users/emptyCart");
-    }
+  
   
 });
 
 
 router.get('/Add-Products-Cart/:id', async (req, res) => {
-  console.log("call came")
-  await userHelper.addProductsCart(req.session.user._id, req.params.id).then(() => {
-    res.json({ status: true })
-  })
+  try{
+    if(req.session.user){
+      console.log("call came")
+      const userID=req.session.user._id;
+      await userHelper.addProductsCart(userID, req.params.id).then(() => {
+        res.json({ status: true })
+      })
+    }else{
+      res.redirect('/')
+    }
+    
+  }catch(error){
+    console.log("add product error:",error)
+  }
+
 }),
 
   router.post("/change-quantity", async (req, res) => {
@@ -157,7 +179,12 @@ router.post("/remove", async (req, res) => {
   }))
 
 router.get("/placeOrder", async (req, res) => {
-  await userHelper.getAmount(req.session.user._id).then((total) => res.render("users/place-Order", { total, user: req.session.user }))
+  try{
+    await userHelper.getAmount(req.session.user._id).then((total) => res.render("users/place-Order", { total, user: req.session.user }))
+  }catch(error){
+    console.log('error',error)
+  }
+  
 
 })
 
@@ -187,11 +214,16 @@ router.post("/placeOrder", async (req, res) => {
 });
 router.get("/orders", async (req, res) => {
   try{
-    const UserId = req.session.user._id
-    const product = await userHelper.listProducts(UserId);
-  
-    console.log(product, "product")
-    res.render("users/orderList", { user: req.session.user, product })
+    if(req.session.user){
+      const UserId = req.session.user._id
+      const product = await userHelper.listProducts(UserId);
+    
+      console.log(product, "product")
+      res.render("users/orderList", { user: req.session.user, product })
+    }else{
+      res.redirect('/login')
+    }
+   
   }catch(error)
   {
     console.log("get orders error:",error)
