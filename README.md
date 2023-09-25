@@ -17,6 +17,10 @@ MongoDB (4.2.0)
 ## Mongo db
 Make sure MongoDB is running on your system
 
+## Installation and Setup
+open a terminal or command prompt and navigate to the directory where you want to clone the repository. Then, run the git clone command:
+https://github.com/Fibinjohnson/Mobikart-E-commerce-website.git
+
 
 # To start
 ```javascript
