@@ -8,7 +8,7 @@ as template engine
 - Razorpay integration :Users can order and pay through either COD or through online payment.
 - User Sign-In and sign-Up feature having Secure registrationprocess with email OTP verification (Node Mailer)
 
-  Admin side: Admin can check the order list and add new products ,edit the products,block the users etc
+## Admin side: Admin can check the order list and add new products ,edit the products,block the users etc
 
 
 # To start
