@@ -24,7 +24,7 @@ https://github.com/Fibinjohnson/Mobikart-E-commerce-website.git
 
 # To start
 ```javascript
-  git clone https://github.com/Anirudhv07/E-commerce-web-app.git
+https://github.com/Fibinjohnson/Mobikart-E-commerce-website.git
    cd E-commerce-web-app
    npm install
    npm start
