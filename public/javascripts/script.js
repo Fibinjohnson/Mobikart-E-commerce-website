@@ -1,6 +1,5 @@
 
 function addToCart(id) {
-  console.log("started");
   $.ajax({
     url: "/Add-Products-Cart/" + id,
     type: "get",
@@ -15,7 +14,7 @@ function addToCart(id) {
       }
     },
   });
-  console.log("ended");
+  
 }
 
 function remove(cartId, productId) {

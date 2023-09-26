@@ -6,8 +6,6 @@ const { ObjectId } = require('mongodb');
 
 module.exports = {
   addProducts: async (product, callBack) => {
-    console.log(product);
-
     try {
       const database = await connectToDB();
 
