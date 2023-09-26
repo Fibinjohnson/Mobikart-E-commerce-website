@@ -8,10 +8,7 @@ module.exports = {
   addProducts: async (product, callBack) => {
     try {
       const database = await connectToDB();
-
-      // Wait until the connection is ready
       await database.command({ ping: 1 });
-
       const collection = database.collection('Product'); 
       const result = await collection.insertOne(product);
         callBack( result.insertedId.toString());
@@ -28,6 +25,7 @@ module.exports = {
   })
     
   },
+
   deleteProducts: (prodId) => {
     return new Promise(async (resolve, reject) => {
       console.log(prodId);
@@ -42,12 +40,14 @@ module.exports = {
       }
     });
   },
+
   editProducts:(prodId)=>{
     return new Promise(async(resolve,reject)=>{
       const database=await connectToDB();
       database.collection(collection.COLLECTION_NAME).findOne({_id:new ObjectId(prodId)}).then((product)=>{resolve(product)})
     })
   },
+
   updateProducts:(prodId,products)=>{
     return new Promise(async(resolve,reject)=>{
       const database=await connectToDB();
@@ -60,6 +60,7 @@ module.exports = {
     }).then((product)=>resolve(product))
     })
   },
+
   doLogin:(data)=>{
     return new Promise(async(resolve,reject)=>{
       const database=await connectToDB();
@@ -79,6 +80,7 @@ module.exports = {
       })
     })
   },
+
   getUsers:()=>{
     return new Promise(async(resolve,reject)=>{
        const database=await connectToDB();
@@ -88,6 +90,7 @@ module.exports = {
        })
     })
   },
+  
   getOrders:()=>{
     return new Promise(async(resolve,reject)=>{
       const database=await connectToDB();

@@ -94,7 +94,7 @@ $(document).ready(function() {
       data: $("#form1").serialize(),
       success: function(response) {
         if(response.codSuccess){
-        location.href = "/placeOrderMsg"; // Replace "/path" with the actual path you want to redirect to
+        location.href = "/placeOrderMsg"; 
        }else{
          razorPayment(response.response)
          
@@ -109,19 +109,19 @@ $(document).ready(function() {
 function razorPayment(order){
 let newOrderAmt=order.amount*100;
   var options = {
-    "key": "rzp_test_poYQA27SDAayai", // Enter the Key ID generated from the Dashboard
-    "amount":newOrderAmt, // Amount is in currency subunits. Default currency is INR. Hence, 50000 refers to 50000 paise
+    "key": "rzp_test_poYQA27SDAayai", 
+    "amount":newOrderAmt, 
     "currency": "INR",
     "name": "MobiKart",
     "description": "Test Transaction",
     "image": "https://example.com/your_logo",
-    "order_id": order.id, //This is a sample Order ID. Pass the `id` obtained in the response of Step 1
+    "order_id": order.id, 
     "handler": function (response){
        
         verifyPayment(response,order)
     },
     "prefill": {
-        "name": "Gaurav Kumar",
+        "name": "Fibin Johnson",
         "email": "gaurav.kumar@example.com",
         "contact": "9000090000"
     },
@@ -185,24 +185,9 @@ function verifyPayment(payment,order){
       error.innerHTML = "Phone number should contain 10 digits";
       return false;
     }
-  
-   
     return true;
   }
 
 </script>
-
-
-
-
- {{!-- $.ajax({
-              url:"/order-Placed",
-              type:"get"
-              location.href=url
-           
-            }) --}}
-
- {{!-- alert(response.razorpay_payment_id);
-        alert(response.razorpay_order_id);
-        alert(response.razorpay_signature); --}}
+   
 
