@@ -209,16 +209,14 @@ let index=userCart.product.findIndex((product)=> {
   
 
 remove:(object)=>{
-
    return new Promise(async(resolve,reject)=>{
      const  database= await connectToDB();
      await database.collection("newCart").updateOne({_id:new ObjectId(object.cartId)},
     {$pull:{product:{prodid:new ObjectId(object.productId)}}}
     ).then((response)=>resolve(true))
-
    })
-   
 },
+
 getAmount:(userId)=>{
   return new Promise(async(resolve,reject)=>{
     try{
@@ -251,7 +249,6 @@ getAmount:(userId)=>{
           { $toInt: { $replaceAll: { input: "$product.price", find: ",", replacement: "" } } }]}}}
         }
       ]).toArray()
-      console.log(totalAmount,"this")
       let total = 0;
 if (totalAmount.length > 0) {
   total = totalAmount[0].total || 0;
@@ -266,8 +263,9 @@ if (totalAmount.length > 0) {
 getCartProducts:async(userId)=>{
   return new Promise(async(resolve,reject)=>{
     const database=await connectToDB();
-    const cart= await database.collection("newCart").findOne({user:new ObjectId(userId)})
-    resolve(cart.product)
+    const cart= await database.collection("newCart")
+    .findOne({user:new ObjectId(userId)})
+     resolve(cart.product)
   })
   
 },
@@ -297,16 +295,18 @@ placeOrder:(order,product,amount)=>{
         }
      }
      const database=await connectToDB();
-     await database.collection("placeOrder").insertOne(orderObj).then((response)=>{
-       database.collection("newCart").deleteOne({user:new ObjectId(order.userId)})
-       resolve(response.insertedId)
+     await database.collection("placeOrder").insertOne(orderObj)
+     .then((response)=>{
+      database.collection("newCart").deleteOne({user:new ObjectId(order.userId)})
+      resolve(response.insertedId)
        
       })
   })
 },
 listProducts:(userId)=>{return new Promise(async(resolve,reject)=>{
      const database=await connectToDB();
-    const placedData=await  database.collection("placeOrder").find({"userDetails.user":new ObjectId(userId)}).toArray()
+    const placedData=await  database.collection("placeOrder")
+    .find({"userDetails.user":new ObjectId(userId)}).toArray()
     resolve(placedData)
 })
 
@@ -316,13 +316,11 @@ getProducts:(prodID)=>{return new Promise(async(resolve,reject)=>{
   const product= database.collection("product").find({_id:new ObjectId(prodID)}).toArray()
   resolve(product)
 })
- 
 },
 razorPayIntegration:(orderId,totalAmount)=>{
- 
   return new Promise(async(resolve,reject)=>{
     var options = {
-      amount: totalAmount*100,  // amount in the smallest currency unit
+      amount: totalAmount*100,  
       currency: "INR",
       receipt: ""+orderId
     };
@@ -333,10 +331,10 @@ razorPayIntegration:(orderId,totalAmount)=>{
         console.log(order,":order");
         resolve(order)
       }
-      
     });
   })
 },
+
 verifyPayment: (details) => {
   return new Promise((resolve, reject) => {
     const crypto = require('crypto');
@@ -352,10 +350,8 @@ verifyPayment: (details) => {
       reject();
     }
   });
-
-
-
 },
+
 changePaymentStatus:(receipt)=>{
   return new Promise(async(resolve,reject)=>{
     const database = await connectToDB();
@@ -366,7 +362,6 @@ changePaymentStatus:(receipt)=>{
       console.log(response);
       resolve();
     });
-    
   })
 },
 
