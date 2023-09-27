@@ -44,6 +44,7 @@ router.get("/delete-Product/:id", (req, res) => {
         res.redirect("/error-page"); 
      });
 });
+
 router.get('/edit-Product/:id',(req,res)=>{
   const prodId=req.params.id;
   productHelpers.editProducts(prodId).then((product)=>res.render("Admin/edit-product",{product,prodId}))
@@ -51,7 +52,6 @@ router.get('/edit-Product/:id',(req,res)=>{
 })
 router.post('/edit-products/:id',(req,res)=>{
   productHelpers.updateProducts(req.params.id,req.body).then(()=>{
-    // res.redirect("/Admin")
     if(req.files && req.files.customFile){
       req.files.customFile.mv("./public/images/"+req.params.id+".jpg")
     }else{
@@ -62,13 +62,9 @@ router.post('/edit-products/:id',(req,res)=>{
 router.get("/login", (req, res) => {
  
   if (req.session.admin) {
-    console.log(req.session.admin,"console")
     res.redirect('/Admin')
   } else
-  console.log("elsecase called")
-  console.log(req.session.adminlogError,"err")
     res.render("Admin/adminLogin",{ "error": req.session.adminlogError })
-    console.log("wrong")
     req.session.adminlogError = false
 
 
@@ -113,7 +109,4 @@ router.get("/orders",(async(req,res)=>{
     res.render('Admin/orderList',{ admin:true ,Details,orders})
   })
 }))
-
-
 module.exports = router;
-// , 

@@ -14,7 +14,6 @@ function addToCart(id) {
       }
     },
   });
-  
 }
 
 function remove(cartId, productId) {
@@ -30,9 +29,6 @@ function remove(cartId, productId) {
     }
   });
 }
-
-
-  
   $('#checkOutPay').submit((e)=>{
     e.preventDefault();
     $.ajax({

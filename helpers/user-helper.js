@@ -82,15 +82,13 @@ let index=userCart.product.findIndex((product)=> {
         {user:new ObjectId(userId), "product.prodid": new ObjectId(userProducts) },
         { $inc: { "product.$.prodIndex": 1 } }
       )
-      .then((res) =>console.log("res",res), resolve())
+      .then((res) => resolve())
       .catch((error) => {
-        console.error("Error occurred during insertion:", error);
-        reject(error); // Reject the promise if an error occurs
+        reject(error); 
       });
     
 
       }else{
-         console.log('Updating existing document');
          const collect = database.collection("newCart");
          collect.updateOne(
         { user: new ObjectId(userId) },
@@ -101,8 +99,8 @@ let index=userCart.product.findIndex((product)=> {
  
 } else {
   
-  await database.collection("newCart").insertOne(cart).then((res) => {
-    resolve(res);
+  await database.collection("newCart").insertOne(cart).then((response) => {
+    resolve(response);
   });
 }  
 
@@ -171,7 +169,6 @@ let index=userCart.product.findIndex((product)=> {
       const database= await connectToDB();
       let Count=0;
       const cartCount=await database.collection("newCart").findOne({user:new ObjectId(userId)});
-      console.log(cartCount,"cartCount")
       if(cartCount!=null){
         Count=cartCount.product.length;
         resolve(Count)
@@ -186,7 +183,6 @@ let index=userCart.product.findIndex((product)=> {
     
    const  count=parseInt(object.count);
     quantity=parseInt(object.quantity)
-    console.log(object,"objecthhhhhhh")
     
     return new Promise(async(resolve,reject)=>{
       const database=await connectToDB();
@@ -311,7 +307,6 @@ placeOrder:(order,product,amount)=>{
 listProducts:(userId)=>{return new Promise(async(resolve,reject)=>{
      const database=await connectToDB();
     const placedData=await  database.collection("placeOrder").find({"userDetails.user":new ObjectId(userId)}).toArray()
-    console.log(placedData,"data")
     resolve(placedData)
 })
 
@@ -319,7 +314,6 @@ listProducts:(userId)=>{return new Promise(async(resolve,reject)=>{
 getProducts:(prodID)=>{return new Promise(async(resolve,reject)=>{
   const database=await connectToDB();
   const product= database.collection("product").find({_id:new ObjectId(prodID)}).toArray()
-  console.log(product)
   resolve(product)
 })
  
@@ -354,9 +348,8 @@ verifyPayment: (details) => {
       resolve();
      
     } else {
-      console.log("error occured in payment verificaation")
+      console.log("error occured in payment verification")
       reject();
-      
     }
   });
 

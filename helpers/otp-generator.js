@@ -6,7 +6,6 @@ const generateOTP = () => {
     }
     return otp;
   };
-  
   module.exports = {
     generateOTP
   };
